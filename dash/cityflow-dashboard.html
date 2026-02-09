@@ -429,9 +429,19 @@
                 console.log('Données initiales reçues');
                 msgData.vehicles.forEach(v => addOrUpdateVehicle(v));
                 updateStats(msgData.stats);
+                if (msgData.trafficSegments) {
+                    msgData.trafficSegments.forEach(segment => {
+                        updateTrafficChart(segment.density);
+                    });
+                }
             } else if (type === 'update') {
                 msgData.vehicles.forEach(v => addOrUpdateVehicle(v));
                 updateStats(msgData.stats);
+                if (msgData.trafficSegments) {
+                    msgData.trafficSegments.forEach(segment => {
+                        updateTrafficChart(segment.density);
+                    });
+                }
             } else if (type === 'alerts') {
                 msgData.forEach(alert => addAlert(alert.message, alert.severity));
             } else if (type === 'predictions') {
