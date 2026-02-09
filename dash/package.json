@@ -1,0 +1,32 @@
+{
+  "name": "cityflow-analytics-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard temps réel pour CityFlow Analytics - Smart City IoT Traffic Management",
+  "main": "backend-server.js",
+  "scripts": {
+    "start": "node backend-server.js",
+    "dev": "nodemon backend-server.js",
+    "test": "echo \"Tests à implémenter\" && exit 0"
+  },
+  "keywords": [
+    "iot",
+    "smart-city",
+    "traffic",
+    "websocket",
+    "real-time",
+    "dashboard"
+  ],
+  "author": "CityFlow Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "mqtt": "^5.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,123 @@
+services:
+  # Dashboard WebSocket Server
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cityflow-dashboard
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - WS_PORT=8080
+      - MQTT_BROKER=mqtt://mosquitto:1883
+    depends_on:
+      - mosquitto
+      - timescaledb
+    networks:
+      - cityflow-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # MQTT Broker (Mosquitto)
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: cityflow-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - cityflow-network
+    restart: unless-stopped
+
+  # TimescaleDB pour séries temporelles
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: cityflow-timescaledb
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=cityflow
+      - POSTGRES_USER=cityflow
+      - POSTGRES_PASSWORD=cityflow_password
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - cityflow-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cityflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus pour monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cityflow-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - cityflow-network
+    restart: unless-stopped
+
+  # Grafana pour visualisation
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cityflow-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-worldmap-panel
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+      - timescaledb
+    networks:
+      - cityflow-network
+    restart: unless-stopped
+
+  # Simulateur IoT (Raspberry Pi virtuels)
+  iot-simulator:
+    build:
+      context: ./iot-simulator
+      dockerfile: Dockerfile
+    container_name: cityflow-iot-simulator
+    environment:
+      - MQTT_BROKER=mqtt://mosquitto:1883
+      - SENSOR_COUNT=50
+      - UPDATE_INTERVAL=5000
+    depends_on:
+      - mosquitto
+    networks:
+      - cityflow-network
+    restart: unless-stopped
+
+networks:
+  cityflow-network:
+    driver: bridge
+
+volumes:
+  timescaledb-data:
+  prometheus-data:
+  grafana-data:
