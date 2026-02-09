@@ -8,5 +8,5 @@ Example : `db/fix/incorrect_character_encoding`
 
 ```mermaid
 flowchart LR
-  "01" <--> "02"
+  01 <--> 02
 ```
