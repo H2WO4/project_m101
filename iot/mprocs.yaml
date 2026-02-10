@@ -1,0 +1,12 @@
+procs:
+  build:
+    shell: cargo b
+    autostart: false
+  run:
+    shell: cargo r
+    autostart: false
+  mqtt:
+    shell: docker compose --profile iot up
+    autostart: false
+    stop:
+      send-keys: ["<C-c>"]
