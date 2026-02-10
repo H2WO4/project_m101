@@ -1,4 +1,298 @@
 services:
+  sensor-0:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 0
+  sensor-1:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 1
+  sensor-2:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 2
+  sensor-3:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 3
+  sensor-4:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 4
+  sensor-5:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 5
+  sensor-6:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 6
+  sensor-7:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 7
+  sensor-8:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 8
+  sensor-9:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 9
+  sensor-10:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 10
+  sensor-11:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 11
+  sensor-12:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 12
+  sensor-13:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 13
+  sensor-14:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 14
+  sensor-15:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 15
+  sensor-16:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 16
+  sensor-17:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 17
+  sensor-18:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 18
+  sensor-19:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 19
+  sensor-20:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 20
+  sensor-21:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 21
+  sensor-22:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 22
+  sensor-23:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 23
+  sensor-24:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 24
+  sensor-25:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 25
+  sensor-26:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 26
+  sensor-27:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 27
+  sensor-28:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 28
+  sensor-29:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 29
+  sensor-30:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 30
+  sensor-31:
+    build: sensor
+    depends_on:
+    - mqtt
+    - aggregator
+    profiles:
+      - iot
+    environment:
+      UNIQUE_ID: 31
+  aggregator:
+    build: aggregator
+    depends_on:
+      - mqtt
+    profiles:
+      - iot
   mqtt:
     image: bytebeamio/rumqttd
     ports:
@@ -6,9 +300,6 @@ services:
       - 1884:1884
     profiles:
       - iot
-    # environment:
 
 networks:
   default:
-
-# volumes:
