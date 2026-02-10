@@ -8,7 +8,7 @@ const path = require('path');
 
 // Configuration
 const PORT = 8080;
-const UPDATE_INTERVAL = 2000; // Mise à jour toutes les 2 secondes
+const UPDATE_INTERVAL = 30000; // Mise à jour toutes les 30 secondes
 
 // Simulation de capteurs IoT
 const PARIS_CENTER = { lat: 48.8566, lng: 2.3522 };

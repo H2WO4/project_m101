@@ -245,6 +245,26 @@
         #trafficChart, #emissionsChart {
             width: 100%;
             height: 200px;
+            display: block;
+        }
+
+        #trafficChart g, #emissionsChart g {
+            font-size: 12px;
+        }
+
+        #trafficChart .x-axis, #trafficChart .y-axis,
+        #emissionsChart .x-axis, #emissionsChart .y-axis {
+            color: #fff;
+        }
+
+        #trafficChart text, #emissionsChart text {
+            fill: #fff;
+        }
+
+        #trafficChart .traffic-line {
+            fill: none;
+            stroke: #4ade80;
+            stroke-width: 2;
         }
 
         .prediction-badge {
@@ -429,9 +449,19 @@
                 console.log('Données initiales reçues');
                 msgData.vehicles.forEach(v => addOrUpdateVehicle(v));
                 updateStats(msgData.stats);
+                if (msgData.trafficSegments) {
+                    msgData.trafficSegments.forEach(segment => {
+                        updateTrafficChart(segment.density);
+                    });
+                }
             } else if (type === 'update') {
                 msgData.vehicles.forEach(v => addOrUpdateVehicle(v));
                 updateStats(msgData.stats);
+                if (msgData.trafficSegments) {
+                    msgData.trafficSegments.forEach(segment => {
+                        updateTrafficChart(segment.density);
+                    });
+                }
             } else if (type === 'alerts') {
                 msgData.forEach(alert => addAlert(alert.message, alert.severity));
             } else if (type === 'predictions') {
@@ -481,9 +511,9 @@
 
         function createTrafficChart() {
             const svg = d3.select('#trafficChart');
-            const width = svg.node().getBoundingClientRect().width;
+            const width = svg.node().getBoundingClientRect().width || 400;
             const height = 200;
-            const margin = { top: 10, right: 10, bottom: 30, left: 40 };
+            const margin = { top: 10, right: 20, bottom: 30, left: 50 };
 
             svg.attr('width', width).attr('height', height);
 
@@ -506,21 +536,16 @@
             svg.append('g')
                 .attr('class', 'x-axis')
                 .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%H:%M')))
-                .attr('color', '#fff');
+                .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%H:%M')));
 
             svg.append('g')
                 .attr('class', 'y-axis')
                 .attr('transform', `translate(${margin.left},0)`)
-                .call(d3.axisLeft(yScale))
-                .attr('color', '#fff');
+                .call(d3.axisLeft(yScale).ticks(5));
 
             // Path pour la ligne
             svg.append('path')
-                .attr('class', 'traffic-line')
-                .attr('fill', 'none')
-                .attr('stroke', '#4ade80')
-                .attr('stroke-width', 2);
+                .attr('class', 'traffic-line');
         }
 
         function updateTrafficChart(newValue) {
@@ -534,9 +559,9 @@
             trafficData = trafficData.filter(d => d.time > thirtyMinutesAgo);
 
             const svg = d3.select('#trafficChart');
-            const width = svg.node().getBoundingClientRect().width;
+            const width = svg.attr('width') || 400;
             const height = 200;
-            const margin = { top: 10, right: 10, bottom: 30, left: 40 };
+            const margin = { top: 10, right: 20, bottom: 30, left: 50 };
 
             const xScale = d3.scaleTime()
                 .domain([new Date() - 30 * 60000, new Date()])
@@ -553,15 +578,14 @@
 
             svg.select('.traffic-line')
                 .datum(trafficData)
-                .transition()
-                .duration(300)
                 .attr('d', line);
 
             // Update axes
             svg.select('.x-axis')
-                .transition()
-                .duration(300)
                 .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%H:%M')));
+            
+            svg.select('.y-axis')
+                .call(d3.axisLeft(yScale).ticks(5));
         }
 
         function createEmissionsChart() {
