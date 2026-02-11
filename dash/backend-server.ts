@@ -1,25 +1,112 @@
 // CityFlow Analytics - WebSocket Server Backend
-// Node.js + WebSocket pour données temps réel
+// Node.js + WebSocket pour données temps réel - TypeScript Version
 
-const WebSocket = require('ws');
-const http = require('http');
-const express = require('express');
-const path = require('path');
+import WebSocket from 'ws';
+import http from 'http';
+import express, { Request, Response } from 'express';
+import path from 'path';
 
-// Configuration
-const PORT = 8080;
-const UPDATE_INTERVAL = 30000; // Mise à jour toutes les 30 secondes
+// =========================
+// TYPES & INTERFACES
+// =========================
+
+interface Coordinates {
+    lat: number;
+    lng: number;
+}
+
+interface VehicleData {
+    id: number;
+    lat: number;
+    lng: number;
+    speed: number;
+    status: VehicleStatus;
+    direction: number;
+    directionName: string;
+}
+
+interface Route {
+    name: string;
+    start: [number, number];
+    end: [number, number];
+}
+
+interface TrafficSegment {
+    id: number;
+    name: string;
+    coordinates: [number, number][];
+    density: number;
+    avgSpeed: number;
+    vehicleCount: number;
+    status: VehicleStatus;
+    color: string;
+}
+
+interface Stats {
+    totalVehicles: number;
+    avgSpeed: number;
+    emissions: number;
+    emissionsReduction: number;
+    timeSaved: number;
+    timestamp: string;
+}
+
+interface Prediction {
+    type: 'congestion' | 'clear';
+    severity?: 'high' | 'medium';
+    location: string;
+    coordinates: [number, number];
+    predictedTime: string;
+    minutesAhead: number;
+    confidence: number;
+    affectedVehicles?: number;
+}
+
+interface Alert {
+    id: number;
+    type: AlertType;
+    severity: 'high' | 'medium' | 'low';
+    message: string;
+    timestamp: string;
+}
+
+interface SensorData {
+    sensorId: number;
+    location: Coordinates;
+    vehicleCount: number;
+    avgSpeed: number;
+    timestamp: string;
+}
+
+interface WebSocketMessage {
+    type: string;
+    data?: any;
+}
+
+type VehicleStatus = 'fluide' | 'dense' | 'embouteillage';
+type AlertType = 'congestion' | 'accident' | 'roadwork' | 'reroute' | 'optimization';
+
+// =========================
+// CONFIGURATION
+// =========================
+
+const PORT: number = 8080;
+const UPDATE_INTERVAL: number = 30000; // Mise à jour toutes les 30 secondes
 
 // Simulation de capteurs IoT
-const PARIS_CENTER = { lat: 48.8566, lng: 2.3522 };
-const SENSOR_COUNT = 50;
+const PARIS_CENTER: Coordinates = { lat: 48.8566, lng: 2.3522 };
+const SENSOR_COUNT: number = 50;
+
+// =========================
+// EXPRESS & WEBSOCKET SETUP
+// =========================
 
 // Express app pour servir le dashboard
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Servir le dashboard principal
-app.get('/', (req, res) => {
+app.get('/', (_req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, 'cityflow-dashboard.html'));
 });
 
@@ -29,23 +116,33 @@ const server = http.createServer(app);
 // WebSocket server
 const wss = new WebSocket.Server({ server });
 
-// Stockage des données
-let vehicles = [];
-let trafficSegments = [];
-let predictions = [];
-let stats = {
+// =========================
+// STOCKAGE DES DONNÉES
+// =========================
+
+let vehicles: Vehicle[] = [];
+let stats: Stats = {
     totalVehicles: 0,
     avgSpeed: 0,
     emissions: 0,
-    timeSaved: 0
+    emissionsReduction: 0,
+    timeSaved: 0,
+    timestamp: new Date().toISOString()
 };
 
 // =========================
-// SIMULATION DE DONNÉES IoT
+// CLASSE VEHICLE
 // =========================
 
 class Vehicle {
-    constructor(id) {
+    id: number;
+    lat: number;
+    lng: number;
+    speed: number;
+    direction: number;
+    status: VehicleStatus;
+
+    constructor(id: number) {
         this.id = id;
         this.lat = PARIS_CENTER.lat + (Math.random() - 0.5) * 0.05;
         this.lng = PARIS_CENTER.lng + (Math.random() - 0.5) * 0.05;
@@ -54,13 +151,13 @@ class Vehicle {
         this.status = this.getStatus();
     }
 
-    getStatus() {
+    getStatus(): VehicleStatus {
         if (this.speed < 30) return 'fluide';
         if (this.speed < 50) return 'dense';
         return 'embouteillage';
     }
 
-    update() {
+    update(): void {
         // Déplacement aléatoire
         const moveSpeed = 0.0001 * (this.speed / 50);
         const radians = (this.direction * Math.PI) / 180;
@@ -88,7 +185,7 @@ class Vehicle {
         }
     }
 
-    getDirectionName() {
+    getDirectionName(): string {
         let dir = this.direction % 360;
         if (dir < 0) dir += 360;
         if (dir >= 337.5 || dir < 22.5) return '↑ N';
@@ -101,7 +198,7 @@ class Vehicle {
         return '↖ NO';
     }
 
-    toJSON() {
+    toJSON(): VehicleData {
         return {
             id: this.id,
             lat: this.lat,
@@ -114,8 +211,12 @@ class Vehicle {
     }
 }
 
+// =========================
+// FONCTIONS DE SIMULATION
+// =========================
+
 // Initialisation des véhicules
-function initVehicles() {
+function initVehicles(): void {
     vehicles = [];
     for (let i = 0; i < 50; i++) {
         vehicles.push(new Vehicle(i));
@@ -123,9 +224,9 @@ function initVehicles() {
 }
 
 // Génération de segments de trafic
-function generateTrafficSegments() {
-    const segments = [];
-    const routes = [
+function generateTrafficSegments(): TrafficSegment[] {
+    const segments: TrafficSegment[] = [];
+    const routes: Route[] = [
         { name: 'Rue de Rivoli', start: [48.8606, 2.3376], end: [48.8566, 2.3522] },
         { name: 'Champs-Élysées', start: [48.8698, 2.3075], end: [48.8738, 2.2950] },
         { name: 'Boulevard Haussmann', start: [48.8738, 2.3329], end: [48.8698, 2.3488] },
@@ -152,7 +253,7 @@ function generateTrafficSegments() {
 }
 
 // Calcul des statistiques globales
-function calculateStats() {
+function calculateStats(): Stats {
     const totalVehicles = vehicles.length;
     const avgSpeed = vehicles.reduce((sum, v) => sum + v.speed, 0) / totalVehicles;
     
@@ -180,8 +281,8 @@ function calculateStats() {
 }
 
 // Génération de prédictions
-function generatePredictions() {
-    const predictions = [];
+function generatePredictions(): Prediction[] {
+    const predictions: Prediction[] = [];
     const now = new Date();
     
     // Prédictions d'embouteillage
@@ -214,10 +315,10 @@ function generatePredictions() {
 }
 
 // Génération d'alertes
-function generateAlerts() {
-    const alerts = [];
-    const types = ['congestion', 'accident', 'roadwork', 'reroute', 'optimization'];
-    const messages = {
+function generateAlerts(): Alert[] {
+    const alerts: Alert[] = [];
+    const types: AlertType[] = ['congestion', 'accident', 'roadwork', 'reroute', 'optimization'];
+    const messages: Record<AlertType, string[]> = {
         congestion: [
             'Embouteillage détecté sur Boulevard Haussmann',
             'Trafic dense sur Champs-Élysées',
@@ -266,7 +367,7 @@ function generateAlerts() {
 // =========================
 
 // Connexion d'un nouveau client
-wss.on('connection', (ws) => {
+wss.on('connection', (ws: WebSocket) => {
     console.log('✅ Nouveau client connecté');
     
     // Envoyer les données initiales
@@ -281,9 +382,9 @@ wss.on('connection', (ws) => {
     }));
 
     // Gérer les messages du client
-    ws.on('message', (message) => {
+    ws.on('message', (message: WebSocket.Data) => {
         try {
-            const data = JSON.parse(message);
+            const data: WebSocketMessage = JSON.parse(message.toString());
             console.log('📨 Message reçu:', data);
             
             // Traiter les requêtes du client
@@ -299,13 +400,13 @@ wss.on('connection', (ws) => {
         console.log('❌ Client déconnecté');
     });
 
-    ws.on('error', (error) => {
+    ws.on('error', (error: Error) => {
         console.error('❌ WebSocket erreur:', error);
     });
 });
 
 // Envoyer une mise à jour à un client
-function sendUpdate(ws) {
+function sendUpdate(ws: WebSocket): void {
     if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
             type: 'update',
@@ -320,7 +421,7 @@ function sendUpdate(ws) {
 }
 
 // Diffuser à tous les clients
-function broadcast(data) {
+function broadcast(data: WebSocketMessage): void {
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify(data));
@@ -332,7 +433,7 @@ function broadcast(data) {
 // SIMULATION LOOP
 // =========================
 
-function simulationLoop() {
+function simulationLoop(): void {
     // Mise à jour des véhicules
     vehicles.forEach(v => v.update());
     
@@ -380,16 +481,16 @@ function simulationLoop() {
 }
 
 // =========================
-// MQTT SIMULATION (pour recevoir données IoT)
+// MQTT SIMULATION
 // =========================
 
 // Simuler la réception de messages MQTT des capteurs
-function simulateMQTTMessages() {
+function simulateMQTTMessages(): void {
     // Dans un vrai système, on recevrait des messages via MQTT
     // Exemple: mqtt.on('message', (topic, message) => { ... })
     
     setInterval(() => {
-        const sensorData = {
+        const sensorData: SensorData = {
             sensorId: Math.floor(Math.random() * SENSOR_COUNT),
             location: {
                 lat: PARIS_CENTER.lat + (Math.random() - 0.5) * 0.05,
@@ -406,26 +507,26 @@ function simulateMQTTMessages() {
 }
 
 // =========================
-// API REST (optionnel)
+// API REST
 // =========================
 
-app.get('/api/stats', (req, res) => {
+app.get('/api/stats', (_req: Request, res: Response) => {
     res.json(calculateStats());
 });
 
-app.get('/api/vehicles', (req, res) => {
+app.get('/api/vehicles', (_req: Request, res: Response) => {
     res.json(vehicles.map(v => v.toJSON()));
 });
 
-app.get('/api/traffic', (req, res) => {
+app.get('/api/traffic', (_req: Request, res: Response) => {
     res.json(generateTrafficSegments());
 });
 
-app.get('/api/predictions', (req, res) => {
+app.get('/api/predictions', (_req: Request, res: Response) => {
     res.json(generatePredictions());
 });
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req: Request, res: Response) => {
     res.json({
         status: 'healthy',
         uptime: process.uptime(),
@@ -474,4 +575,4 @@ process.on('SIGINT', () => {
     });
 });
 
-module.exports = { app, server, wss };
+export { app, server, wss };

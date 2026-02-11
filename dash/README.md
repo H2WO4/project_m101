@@ -1,4 +1,4 @@
-# 🚦 CityFlow Analytics - Dashboard Temps Réel
+# 🚦 CityFlow Analytics - Dashboard Temps Réel (TypeScript)
 
 Système IoT de gestion intelligente du trafic urbain avec prédiction d'embouteillages et reroutage automatique pour réduire les émissions de CO₂ de 23%.
 
@@ -10,6 +10,7 @@ Système IoT de gestion intelligente du trafic urbain avec prédiction d'emboute
 - 🗺️ Reroutage intelligent automatique
 - 📊 Dashboard temps réel avec WebSockets
 - 🌱 Réduction des émissions de CO₂
+- 🔷 **Backend TypeScript avec typage strict**
 
 ## ✨ Fonctionnalités
 
@@ -21,7 +22,7 @@ Système IoT de gestion intelligente du trafic urbain avec prédiction d'emboute
 - **Métriques Live**: Véhicules actifs, vitesse moyenne, émissions, temps gagné
 
 ### Architecture Technique
-- **Backend**: Node.js + WebSocket + Express
+- **Backend**: Node.js + TypeScript + WebSocket + Express
 - **Frontend**: HTML5 + Leaflet.js + D3.js
 - **Base de données**: TimescaleDB (séries temporelles)
 - **Messaging**: MQTT (Mosquitto)
@@ -33,7 +34,8 @@ Système IoT de gestion intelligente du trafic urbain avec prédiction d'emboute
 
 ### Prérequis
 - Docker & Docker Compose
-- Node.js 18+
+- Node.js >= 16.0.0
+- npm ou yarn
 - (Optionnel) Kubernetes/K3s pour déploiement en production
 
 ### Installation Locale
@@ -61,14 +63,20 @@ http://localhost:8080
 npm install
 ```
 
-2. **Lancer le serveur backend**
+2. **Mode développement avec hot-reload (TypeScript)**
 ```bash
+npm run dev
+```
+
+3. **Ou compiler et lancer en production**
+```bash
+npm run build
 npm start
 ```
 
-3. **Ouvrir le dashboard**
+4. **Ouvrir le dashboard**
 ```bash
-open cityflow-dashboard.html
+open http://localhost:8080
 ```
 
 ## 📁 Structure du Projet
@@ -76,11 +84,13 @@ open cityflow-dashboard.html
 ```
 cityflow-analytics/
 ├── cityflow-dashboard.html     # Dashboard frontend
-├── backend-server.js           # Serveur WebSocket Node.js
+├── backend-server.ts           # Serveur WebSocket TypeScript
 ├── package.json                # Dépendances npm
+├── tsconfig.json               # Configuration TypeScript
 ├── Dockerfile                  # Image Docker du dashboard
 ├── docker-compose.yml          # Orchestration multi-services
 ├── init-db.sql                 # Schéma TimescaleDB
+├── dist/                       # Fichiers compilés (après build)
 │
 ├── k8s/                        # Manifestes Kubernetes
 │   ├── deployment.yaml         # Déploiements, Services, HPA
@@ -168,6 +178,76 @@ Messages reçus:
 - `type: 'update'` - Mises à jour véhicules/trafic
 - `type: 'predictions'` - Nouvelles prédictions
 - `type: 'alerts'` - Alertes système
+
+## 🔷 TypeScript
+
+### Avantages de la Migration
+
+- ✅ **Typage strict** de toutes les variables et fonctions
+- ✅ **Interfaces** pour structures de données (VehicleData, TrafficSegment, Stats, etc.)
+- ✅ **Union types** pour les enums (VehicleStatus, AlertType)
+- ✅ **Autocomplétion** améliorée dans l'IDE
+- ✅ **Détection d'erreurs** à la compilation
+- ✅ **Meilleure maintenabilité** du code
+
+### Types Principaux
+
+```typescript
+interface VehicleData {
+    id: number;
+    lat: number;
+    lng: number;
+    speed: number;
+    status: VehicleStatus;
+    direction: number;
+    directionName: string;
+}
+
+interface TrafficSegment {
+    id: number;
+    name: string;
+    coordinates: [number, number][];
+    density: number;
+    avgSpeed: number;
+    vehicleCount: number;
+    status: VehicleStatus;
+    color: string;
+}
+
+interface Stats {
+    totalVehicles: number;
+    avgSpeed: number;
+    emissions: number;
+    emissionsReduction: number;
+    timeSaved: number;
+    timestamp: string;
+}
+
+type VehicleStatus = 'fluide' | 'dense' | 'embouteillage';
+type AlertType = 'congestion' | 'accident' | 'roadwork' | 'reroute' | 'optimization';
+```
+
+### Scripts npm
+
+```bash
+# Compiler TypeScript → JavaScript
+npm run build
+
+# Mode développement avec hot-reload
+npm run dev
+
+# Compiler en mode watch
+npm run watch
+
+# Nettoyer les fichiers compilés
+npm run clean
+
+# Lancer en production
+npm start
+
+# Tests
+npm test
+```
 
 ## 🐳 Docker
 
@@ -304,7 +384,7 @@ DB_PORT=5432                          # Port TimescaleDB
 DB_NAME=cityflow                      # Nom de la BDD
 DB_USER=cityflow                      # User BDD
 DB_PASSWORD=cityflow_password         # Password BDD
-UPDATE_INTERVAL=2000                  # Intervalle mise à jour (ms)
+UPDATE_INTERVAL=30000                 # Intervalle mise à jour (ms)
 ```
 
 **Simulateur IoT:**
@@ -313,6 +393,86 @@ MQTT_BROKER=mqtt://mosquitto:1883     # Broker MQTT
 SENSOR_COUNT=50                       # Nombre de capteurs
 UPDATE_INTERVAL=5000                  # Intervalle envoi (ms)
 ```
+
+### Configuration TypeScript
+
+Dans `tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": "./"
+  }
+}
+```
+
+## 📊 Architecture Backend (TypeScript)
+
+```
+backend-server.ts
+├── Types & Interfaces
+│   ├── Coordinates
+│   ├── VehicleData
+│   ├── Route
+│   ├── TrafficSegment
+│   ├── Stats
+│   ├── Prediction
+│   ├── Alert
+│   ├── SensorData
+│   └── WebSocketMessage
+│
+├── Configuration
+│   ├── PORT, UPDATE_INTERVAL
+│   ├── PARIS_CENTER, SENSOR_COUNT
+│   ├── Express App
+│   └── WebSocket Server
+│
+├── Classe Vehicle (TypeScript)
+│   ├── Propriétés typées
+│   ├── Méthodes: update(), getStatus()
+│   └── toJSON(): VehicleData
+│
+├── Simulation
+│   ├── initVehicles()
+│   ├── generateTrafficSegments()
+│   ├── calculateStats()
+│   ├── generatePredictions()
+│   └── generateAlerts()
+│
+├── WebSocket Management
+│   ├── Connexion clients
+│   ├── broadcast()
+│   ├── sendUpdate()
+│   └── Message handling (typé)
+│
+├── Simulation Loop
+│   ├── Update véhicules
+│   ├── Ajout/suppression dynamique
+│   └── Broadcasting updates
+│
+├── MQTT Simulation
+│   └── simulateMQTTMessages()
+│
+└── API REST (TypeScript)
+    ├── GET /api/stats
+    ├── GET /api/vehicles
+    ├── GET /api/traffic
+    ├── GET /api/predictions
+    └── GET /api/health
+```
+
+## 📈 Données Simulées
+
+- **50+ véhicules** en mouvement permanent
+- **4 segments de trafic** principaux (rues de Paris)
+- **Mises à jour toutes les 30 secondes**
+- **Prédictions d'embouteillages** avec IA
+- **Alertes en temps réel** (accidents, travaux, optimisations)
+- **Capteurs IoT** simulés (lecture toutes les 5 secondes)
 
 ## 🧪 Tests
 
@@ -346,6 +506,7 @@ npm run test:load
 - Caching Redis (optionnel)
 - Load balancing (3+ replicas)
 - HPA (Horizontal Pod Autoscaling)
+- **Compilation TypeScript optimisée**
 
 ## 🔐 Sécurité
 
@@ -374,6 +535,21 @@ annotations:
 const ws = new WebSocket('wss://cityflow.example.com/ws');
 ```
 
+## 🛠️ Technologies
+
+- **TypeScript 5.3+** - Langage principal avec typage strict
+- **Node.js >= 16.0.0** - Runtime
+- **Express 4.18+** - Framework web
+- **ws 8.14+** - WebSocket server
+- **mqtt 5.2+** - Client MQTT pour capteurs IoT
+- **ts-node-dev** - Hot reload en développement
+- **Leaflet.js** - Cartes interactives
+- **D3.js** - Visualisations de données
+- **TimescaleDB** - Base de données séries temporelles
+- **Mosquitto** - MQTT Broker
+- **Prometheus + Grafana** - Monitoring
+- **Kubernetes + ArgoCD** - Orchestration & GitOps
+
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues !
@@ -384,6 +560,13 @@ Les contributions sont les bienvenues !
 4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
+### Guidelines de Contribution
+
+- Utiliser TypeScript avec typage strict
+- Suivre les conventions de code existantes
+- Ajouter des tests pour les nouvelles fonctionnalités
+- Documenter les interfaces et types publics
+
 ## 📝 Licence
 
 Ce projet est sous licence MIT. Voir `LICENSE` pour plus de détails.
@@ -393,6 +576,7 @@ Ce projet est sous licence MIT. Voir `LICENSE` pour plus de détails.
 - **Développement**: CityFlow Team
 - **Architecture**: IoT & Microservices
 - **DevOps**: K8s + GitOps
+- **Migration TypeScript**: 2024
 
 ## 📧 Contact
 
@@ -402,6 +586,7 @@ Ce projet est sous licence MIT. Voir `LICENSE` pour plus de détails.
 
 ## 🙏 Remerciements
 
+- [TypeScript](https://www.typescriptlang.org/) - Langage typé pour JavaScript
 - [Leaflet.js](https://leafletjs.com/) - Cartes interactives
 - [D3.js](https://d3js.org/) - Visualisations de données
 - [TimescaleDB](https://www.timescale.com/) - Base de données séries temporelles
