@@ -169,21 +169,21 @@ class Vehicle {
         // Déplacement aléatoire
         const moveSpeed = 0.0001 * (this.speed / 50);
         const radians = (this.direction * Math.PI) / 180;
-        
+
         this.lat += Math.cos(radians) * moveSpeed;
         this.lng += Math.sin(radians) * moveSpeed;
-        
+
         // Variation de vitesse
         this.speed += (Math.random() - 0.5) * 5;
         this.speed = Math.max(5, Math.min(80, this.speed));
-        
+
         // Changement de direction occasionnel
         if (Math.random() > 0.95) {
             this.direction += (Math.random() - 0.5) * 90;
         }
-        
+
         this.status = this.getStatus();
-        
+
         // Rebond aux limites
         if (Math.abs(this.lat - PARIS_CENTER.lat) > 0.025) {
             this.direction = 180 - this.direction;
@@ -238,13 +238,13 @@ function generateTrafficSegments(): TrafficSegment[] {
         { name: 'Rue de Rivoli', start: [48.8606, 2.3376], end: [48.8566, 2.3522] },
         { name: 'Champs-Élysées', start: [48.8698, 2.3075], end: [48.8738, 2.2950] },
         { name: 'Boulevard Haussmann', start: [48.8738, 2.3329], end: [48.8698, 2.3488] },
-        { name: 'Rue Lafayette', start: [48.8755, 2.3487], end: [48.8796, 2.3543] },
+        { name: 'Rue Lafayette', start: [48.8755, 2.3487], end: [48.8796, 2.3543] }
     ];
 
     routes.forEach((route, idx) => {
         const density = 20 + Math.random() * 70;
         const avgSpeed = 80 - density * 0.8;
-        
+
         segments.push({
             id: idx,
             name: route.name,
@@ -264,15 +264,15 @@ function generateTrafficSegments(): TrafficSegment[] {
 function calculateStats(): Stats {
     const totalVehicles = vehicles.length;
     const avgSpeed = vehicles.reduce((sum, v) => sum + v.speed, 0) / totalVehicles;
-    
+
     // Calcul des émissions (simplifié)
     const baseEmissions = 2500;
     const speedFactor = avgSpeed / 50; // Optimal à 50 km/h
     const emissions = baseEmissions * (2 - speedFactor);
-    
+
     // Réduction grâce au reroutage (23% objectif)
     const emissionsReduction = baseEmissions * 0.23;
-    
+
     // Temps gagné
     const timeSaved = 5 + Math.random() * 8;
 
@@ -292,7 +292,7 @@ function calculateStats(): Stats {
 function generatePredictions(): Prediction[] {
     const predictions: Prediction[] = [];
     const now = new Date();
-    
+
     // Prédictions d'embouteillage
     if (Math.random() > 0.3) {
         predictions.push({
@@ -357,7 +357,7 @@ function generateAlerts(): Alert[] {
         const type = types[Math.floor(Math.random() * types.length)];
         const messageList = messages[type];
         const message = messageList[Math.floor(Math.random() * messageList.length)];
-        
+
         alerts.push({
             id: Date.now(),
             type,
@@ -377,7 +377,7 @@ function generateAlerts(): Alert[] {
 // Connexion d'un nouveau client
 wss.on('connection', (ws: WebSocket) => {
     console.log('✅ Nouveau client connecté');
-    
+
     // Envoyer les données initiales
     ws.send(JSON.stringify({
         type: 'init',
@@ -394,7 +394,7 @@ wss.on('connection', (ws: WebSocket) => {
         try {
             const data: WebSocketMessage = JSON.parse(message.toString());
             console.log('📨 Message reçu:', data);
-            
+
             // Traiter les requêtes du client
             if (data.type === 'request_update') {
                 sendUpdate(ws);
@@ -444,7 +444,7 @@ function broadcast(data: WebSocketMessage): void {
 function simulationLoop(): void {
     // Mise à jour des véhicules
     vehicles.forEach(v => v.update());
-    
+
     // Ajout/suppression dynamique de véhicules pour varier le nombre
     if (Math.random() > 0.85 && vehicles.length < 100) {
         // Ajouter un véhicule
@@ -453,7 +453,7 @@ function simulationLoop(): void {
         // Retirer un véhicule
         vehicles.pop();
     }
-    
+
     // Calcul des nouvelles données
     const newStats = calculateStats();
     const newSegments = generateTrafficSegments();
@@ -496,7 +496,7 @@ function simulationLoop(): void {
 function simulateMQTTMessages(): void {
     // Dans un vrai système, on recevrait des messages via MQTT
     // Exemple: mqtt.on('message', (topic, message) => { ... })
-    
+
     setInterval(() => {
         const sensorData: SensorData = {
             sensorId: Math.floor(Math.random() * SENSOR_COUNT),
@@ -565,10 +565,10 @@ server.listen(PORT, () => {
 
     // Initialiser la simulation
     initVehicles();
-    
+
     // Démarrer la boucle de simulation
     setInterval(simulationLoop, UPDATE_INTERVAL);
-    
+
     // Démarrer la simulation MQTT
     simulateMQTTMessages();
 });

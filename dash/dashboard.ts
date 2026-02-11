@@ -60,37 +60,37 @@ const MAP_ZOOM: number = 13;
 // WEBSOCKET CONNECTION
 // =========================
 let ws: WebSocket;
-let reconnectInterval: number;
+let _reconnectInterval: number;
 
 function connectWebSocket(): void {
     ws = new WebSocket(WS_URL);
-    
+
     ws.onopen = () => {
         console.log('WebSocket connecté');
         updateConnectionStatus(true);
     };
-    
+
     ws.onmessage = (event: MessageEvent) => {
         const data: WebSocketMessage = JSON.parse(event.data);
         console.log('Message reçu:', data);
         handleIncomingData(data);
     };
-    
+
     ws.onerror = (error: Event) => {
         console.error('WebSocket error:', error);
         updateConnectionStatus(false);
     };
-    
+
     ws.onclose = () => {
         console.log('WebSocket déconnecté');
         updateConnectionStatus(false);
-        reconnectInterval = window.setTimeout(connectWebSocket, 5000);
+        _reconnectInterval = window.setTimeout(connectWebSocket, 5000);
     };
 }
 
 function handleIncomingData(data: WebSocketMessage): void {
     const { type, data: msgData } = data;
-    
+
     if (type === 'init') {
         console.log('Données initiales reçues');
         msgData.vehicles.forEach((v: VehicleData) => addOrUpdateVehicle(v));
@@ -118,7 +118,7 @@ function handleIncomingData(data: WebSocketMessage): void {
 function updateConnectionStatus(connected: boolean): void {
     const indicator = document.getElementById('statusIndicator');
     const text = document.getElementById('statusText');
-    
+
     if (indicator && text) {
         if (connected) {
             indicator.classList.remove('disconnected');
@@ -143,13 +143,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Stockage des marqueurs et routes
 const vehicleMarkers = new Map<number, any>();
 const routeLines = new Map<string, any>();
-const trafficSegments: any[] = [];
+const _trafficSegments: any[] = [];
 
 // =========================
 // DATA VISUALIZATION
 // =========================
 let trafficData: TrafficPoint[] = [];
-let emissionsData: any[] = [];
+const emissionsData: any[] = [];
 
 function initCharts(): void {
     createTrafficChart();
@@ -230,7 +230,7 @@ function updateTrafficChart(newValue: number): void {
     // Update axes
     svg.select('.x-axis')
         .call(d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat('%H:%M')));
-    
+
     svg.select('.y-axis')
         .call(d3.axisLeft(yScale).ticks(5));
 }
@@ -306,20 +306,20 @@ function createEmissionsChart(): void {
 function addAlert(message: string, type: string = 'warning'): void {
     const alertsList = document.getElementById('alertsList');
     if (!alertsList) return;
-    
+
     const alertItem = document.createElement('div');
     alertItem.className = `alert-item ${type}`;
-    
+
     const now = new Date();
     const timeString = now.toLocaleTimeString('fr-FR');
-    
+
     alertItem.innerHTML = `
         <div>${message}</div>
         <div class="alert-time">${timeString}</div>
     `;
-    
+
     alertsList.insertBefore(alertItem, alertsList.firstChild);
-    
+
     // Limite à 10 alertes
     while (alertsList.children.length > 10) {
         if (alertsList.lastChild) {
@@ -345,7 +345,7 @@ function getColorByDirection(direction: number): string {
 
 function addOrUpdateVehicle(vehicleData: VehicleData): void {
     const { id, lat, lng, speed, status, direction, directionName = '? UNK' } = vehicleData;
-    
+
     const color = getColorByDirection(direction);
 
     const icon = L.divIcon({
@@ -374,7 +374,7 @@ function addOrUpdateVehicle(vehicleData: VehicleData): void {
 
 function drawRoute(routeData: RouteData): void {
     const { id, coordinates, color = '#3b82f6' } = routeData;
-    
+
     if (routeLines.has(id)) {
         map.removeLayer(routeLines.get(id));
     }
@@ -392,7 +392,7 @@ function drawRoute(routeData: RouteData): void {
 // =========================
 // SIMULATION MODE
 // =========================
-function startSimulation(): void {
+function _startSimulation(): void {
     // Statistiques initiales
     updateStats({
         vehicleCount: 342,
@@ -406,7 +406,7 @@ function startSimulation(): void {
         const lat = MAP_CENTER[0] + (Math.random() - 0.5) * 0.05;
         const lng = MAP_CENTER[1] + (Math.random() - 0.5) * 0.05;
         const speed = 20 + Math.random() * 60;
-        
+
         addOrUpdateVehicle({
             id: i,
             lat,
@@ -434,7 +434,7 @@ function startSimulation(): void {
     setInterval(() => {
         const trafficDensity = 30 + Math.random() * 50;
         updateTrafficChart(trafficDensity);
-        
+
         // Mise à jour aléatoire des stats
         updateStats({
             vehicleCount: 300 + Math.floor(Math.random() * 100),
@@ -451,8 +451,8 @@ function startSimulation(): void {
                 'Optimisation de route effectuée: +5% efficacité',
                 'Capteur #42 déconnecté - Zone non couverte'
             ];
-            addAlert(alerts[Math.floor(Math.random() * alerts.length)], 
-                    Math.random() > 0.5 ? 'warning' : 'info');
+            addAlert(alerts[Math.floor(Math.random() * alerts.length)],
+                Math.random() > 0.5 ? 'warning' : 'info');
         }
     }, 3000);
 }
@@ -462,7 +462,7 @@ function updateStats(stats: StatsData): void {
     const avgSpeedEl = document.getElementById('avgSpeed');
     const emissionsEl = document.getElementById('emissions');
     const timeSavedEl = document.getElementById('timeSaved');
-    
+
     if (vehicleCountEl) vehicleCountEl.textContent = String(stats.vehicleCount || stats.totalVehicles || 0);
     if (avgSpeedEl) avgSpeedEl.textContent = (stats.avgSpeed || 0).toFixed(1);
     if (emissionsEl) emissionsEl.textContent = (stats.emissions || 0).toFixed(0);
