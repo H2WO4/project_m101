@@ -4,10 +4,13 @@
   "description": "Dashboard temps réel pour CityFlow Analytics - Smart City IoT Traffic Management",
   "main": "dist/backend-server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:backend && npm run build:dashboard",
+    "build:backend": "tsc",
+    "build:dashboard": "tsc --project tsconfig.dashboard.json",
     "start": "node dist/backend-server.js",
     "dev": "ts-node-dev --respawn --transpile-only backend-server.ts",
     "watch": "tsc --watch",
+    "watch:dashboard": "tsc --project tsconfig.dashboard.json --watch",
     "clean": "rm -rf dist",
     "test": "echo \"Tests à implémenter\" && exit 0"
   },

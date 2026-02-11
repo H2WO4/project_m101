@@ -24,10 +24,11 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "**/*.ts"
+    "backend-server.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "dashboard.ts"
   ]
 }

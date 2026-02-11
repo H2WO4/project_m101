@@ -103,11 +103,19 @@ const SENSOR_COUNT: number = 50;
 
 // Express app pour servir le dashboard
 const app = express();
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Servir les fichiers statiques (CSS, JS, etc.)
+// En dev: __dirname pointe vers la racine du projet
+// En prod: __dirname pointe vers dist/
+const isProduction = __dirname.includes('dist');
+const staticPath = isProduction ? path.join(__dirname, '..') : __dirname;
+
+app.use(express.static(staticPath));
+app.use('/dist', express.static(path.join(staticPath, 'dist')));
 
 // Servir le dashboard principal
 app.get('/', (_req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, 'cityflow-dashboard.html'));
+    res.sendFile(path.join(staticPath, 'cityflow-dashboard.html'));
 });
 
 // Créer serveur HTTP
