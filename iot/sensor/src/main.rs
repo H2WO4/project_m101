@@ -20,17 +20,13 @@ async fn main() {
     let (client, mut event_poll) = AsyncClient::new(mqtt_options, 10);
 
     let topic = format!("traffic/{unique_id}");
-    let result = client.subscribe(topic.clone(), QoS::AtMostOnce).await;
-    if let Err(error) = result {
-        println!("Error: {error}");
-    }
 
     task::spawn(async move {
-        let wait_time = 60;
+        let wait_time = 24;
 
         loop {
-            let avg_speed: u32 = 50;
-            let data = vec![32, avg_speed as u8 /* traffics... */];
+            let avg_speed: u32 = ((unique_id as u32) * 17 % 43) + 10;
+            let data = vec![avg_speed as u8];
 
             let result = client
                 .publish(topic.clone(), QoS::AtLeastOnce, true, data)

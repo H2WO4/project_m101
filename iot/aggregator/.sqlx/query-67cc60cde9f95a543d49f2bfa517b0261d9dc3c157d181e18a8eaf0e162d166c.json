@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO\n    nodes (id, avg_speed, time_)\nVALUES\n    ($1, $2, $3)\nON CONFLICT\n    (id)\nDO UPDATE SET\n    avg_speed = excluded.avg_speed,\n    time_ = excluded.time_\n",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "67cc60cde9f95a543d49f2bfa517b0261d9dc3c157d181e18a8eaf0e162d166c"
+}

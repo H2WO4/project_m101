@@ -263,6 +263,11 @@ services:
       - db
     profiles:
       - full
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+      DATABASE_URL: postgres://postgres:password@db
 
   mqtt:
     image: bytebeamio/rumqttd
@@ -278,7 +283,6 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=cityflow
     ports:
       - 5432:5432
     profiles:

@@ -12,6 +12,7 @@ RUN rm src/*.rs
 
 # Build application
 COPY ./src ./src
+COPY ./.sqlx ./.sqlx
 
 RUN rm ./target/release/deps/aggregator*
 RUN cargo build --release
