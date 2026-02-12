@@ -11,8 +11,8 @@
     "dev": "ts-node-dev --respawn --transpile-only backend-server.ts",
     "watch": "tsc --watch",
     "watch:dashboard": "tsc --project tsconfig.dashboard.json --watch",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "clean": "rm -rf dist",
     "test": "echo \"Tests à implémenter\" && exit 0"
   },
