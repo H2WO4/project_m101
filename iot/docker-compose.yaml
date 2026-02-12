@@ -299,8 +299,6 @@ services:
       - 1883:1883
       - 1884:1884
     profiles:
-      - ioty
-      
-
+      - iot
 networks:
   default:
