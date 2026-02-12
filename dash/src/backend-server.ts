@@ -135,7 +135,7 @@ let stats: Stats = {
   emissions: 0,
   emissionsReduction: 0,
   timeSaved: 0,
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString(),
 };
 
 // =========================
@@ -214,7 +214,7 @@ class Vehicle {
       speed: Math.round(this.speed * 10) / 10,
       status: this.status,
       direction: Math.round(this.direction),
-      directionName: this.getDirectionName()
+      directionName: this.getDirectionName(),
     };
   }
 }
@@ -238,7 +238,7 @@ function generateTrafficSegments(): TrafficSegment[] {
     { name: "Rue de Rivoli", start: [48.8606, 2.3376], end: [48.8566, 2.3522] },
     { name: "Champs-Élysées", start: [48.8698, 2.3075], end: [48.8738, 2.2950] },
     { name: "Boulevard Haussmann", start: [48.8738, 2.3329], end: [48.8698, 2.3488] },
-    { name: "Rue Lafayette", start: [48.8755, 2.3487], end: [48.8796, 2.3543] }
+    { name: "Rue Lafayette", start: [48.8755, 2.3487], end: [48.8796, 2.3543] },
   ];
 
   routes.forEach((route, idx) => {
@@ -253,7 +253,7 @@ function generateTrafficSegments(): TrafficSegment[] {
       avgSpeed: Math.round(avgSpeed * 10) / 10,
       vehicleCount: Math.floor(density / 5),
       status: avgSpeed < 30 ? "embouteillage" : avgSpeed < 50 ? "dense" : "fluide",
-      color: avgSpeed < 30 ? "#ef4444" : avgSpeed < 50 ? "#fbbf24" : "#22c55e"
+      color: avgSpeed < 30 ? "#ef4444" : avgSpeed < 50 ? "#fbbf24" : "#22c55e",
     });
   });
 
@@ -282,7 +282,7 @@ function calculateStats(): Stats {
     emissions: Math.round(emissions - emissionsReduction),
     emissionsReduction: Math.round((emissionsReduction / baseEmissions) * 100),
     timeSaved: Math.round(timeSaved * 10) / 10,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
   return stats;
@@ -303,7 +303,7 @@ function generatePredictions(): Prediction[] {
       predictedTime: new Date(now.getTime() + 25 * 60000).toISOString(),
       minutesAhead: 25,
       confidence: 0.85 + Math.random() * 0.1,
-      affectedVehicles: Math.floor(30 + Math.random() * 50)
+      affectedVehicles: Math.floor(30 + Math.random() * 50),
     });
   }
 
@@ -315,7 +315,7 @@ function generatePredictions(): Prediction[] {
       coordinates: [48.8798, 2.3765],
       predictedTime: new Date(now.getTime() + 15 * 60000).toISOString(),
       minutesAhead: 15,
-      confidence: 0.92
+      confidence: 0.92,
     });
   }
 
@@ -330,27 +330,27 @@ function generateAlerts(): Alert[] {
     congestion: [
       "Embouteillage détecté sur Boulevard Haussmann",
       "Trafic dense sur Champs-Élysées",
-      "Congestion croissante Rue de Rivoli"
+      "Congestion croissante Rue de Rivoli",
     ],
     accident: [
       "Accident signalé Avenue Foch",
       "Incident mineur Place de la Concorde",
-      "Véhicule en panne Pont Neuf"
+      "Véhicule en panne Pont Neuf",
     ],
     roadwork: [
       "Travaux programmés Rue du Louvre",
-      "Maintenance voirie Boulevard Saint-Germain"
+      "Maintenance voirie Boulevard Saint-Germain",
     ],
     reroute: [
       "Route alternative proposée: -12 minutes",
       "Optimisation itinéraire: gain de 8 minutes",
-      "Nouveau trajet suggéré via Quai de la Seine"
+      "Nouveau trajet suggéré via Quai de la Seine",
     ],
     optimization: [
       "Réduction d'émissions: objectif 23% atteint",
       "Efficacité du trafic: +15% ce mois",
-      "Temps d'attente moyen réduit de 7 minutes"
-    ]
+      "Temps d'attente moyen réduit de 7 minutes",
+    ],
   };
 
   if (Math.random() > 0.7) {
@@ -363,7 +363,7 @@ function generateAlerts(): Alert[] {
       type,
       severity: type === "accident" ? "high" : type === "congestion" ? "medium" : "low",
       message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -385,8 +385,8 @@ wss.on("connection", (ws: WebSocket) => {
       vehicles: vehicles.map(v => v.toJSON()),
       trafficSegments: generateTrafficSegments(),
       stats: calculateStats(),
-      predictions: generatePredictions()
-    }
+      predictions: generatePredictions(),
+    },
   }));
 
   // Gérer les messages du client
@@ -422,8 +422,8 @@ function sendUpdate(ws: WebSocket): void {
         vehicles: vehicles.map(v => v.toJSON()),
         trafficSegments: generateTrafficSegments(),
         stats: calculateStats(),
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     }));
   }
 }
@@ -467,15 +467,15 @@ function simulationLoop(): void {
       vehicles: vehicles.map(v => v.toJSON()),
       trafficSegments: newSegments,
       stats: newStats,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 
   // Envoyer les prédictions
   if (newPredictions.length > 0) {
     broadcast({
       type: "predictions",
-      data: newPredictions
+      data: newPredictions,
     });
   }
 
@@ -483,7 +483,7 @@ function simulationLoop(): void {
   if (newAlerts.length > 0) {
     broadcast({
       type: "alerts",
-      data: newAlerts
+      data: newAlerts,
     });
   }
 }
@@ -502,11 +502,11 @@ function simulateMQTTMessages(): void {
       sensorId: Math.floor(Math.random() * SENSOR_COUNT),
       location: {
         lat: PARIS_CENTER.lat + (Math.random() - 0.5) * 0.05,
-        lng: PARIS_CENTER.lng + (Math.random() - 0.5) * 0.05
+        lng: PARIS_CENTER.lng + (Math.random() - 0.5) * 0.05,
       },
       vehicleCount: Math.floor(Math.random() * 50),
       avgSpeed: 20 + Math.random() * 60,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Traiter les données du capteur
@@ -540,7 +540,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
     uptime: process.uptime(),
     connections: wss.clients.size,
     vehicles: vehicles.length,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

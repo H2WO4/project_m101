@@ -4,13 +4,10 @@
   "description": "Dashboard temps réel pour CityFlow Analytics - Smart City IoT Traffic Management",
   "main": "dist/backend-server.js",
   "scripts": {
-    "build": "npm run build:backend && npm run build:dashboard",
-    "build:backend": "tsc",
-    "build:dashboard": "tsc --project tsconfig.dashboard.json",
-    "start": "node dist/backend-server.js",
-    "dev": "ts-node-dev --respawn --transpile-only backend-server.ts",
+    "build": "tsc",
+    "start": "node dist/src/backend-server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/backend-server.ts",
     "watch": "tsc --watch",
-    "watch:dashboard": "tsc --project tsconfig.dashboard.json --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rm -rf dist",
@@ -33,6 +30,7 @@
     "ws": "^8.14.2"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.8.0",
     "@types/d3": "^7.4.3",
     "@types/express": "^4.17.21",
@@ -41,11 +39,11 @@
     "@types/ws": "^8.5.10",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=16.0.0"
