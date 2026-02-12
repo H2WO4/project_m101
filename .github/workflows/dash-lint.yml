@@ -23,7 +23,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies and run ESLint
+        working-directory: ./dash
         run: |
-          cd dash
           npm ci
           npm run lint
