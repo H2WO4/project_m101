@@ -300,6 +300,7 @@ services:
       - 1884:1884
     profiles:
       - iot
+      - mqtt
 
 networks:
   default:
