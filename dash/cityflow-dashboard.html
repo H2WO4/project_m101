@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚦 CityFlow Analytics - Dashboard Temps Réel</title>
+    
+    <!-- Leaflet CSS for OpenStreetMap -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="cityflow-dashboard.css" />
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            🚦 CityFlow Analytics
+        </div>
+        <div class="connection-status">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="statusText">Connecté au serveur</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Section Carte -->
+        <div class="map-section">
+            <div class="map-overlay">
+                <h3>Légende</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #22c55e;"></div>
+                    <span>Fluide (&lt; 30 km/h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fbbf24;"></div>
+                    <span>Dense (30-50 km/h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <span>Embouteillé (&gt; 50 km/h)</span>
+                </div>
+            </div>
+            <div class="prediction-badge" id="predictionBadge">
+                🔮 Prédiction: Embouteillage dans 25 min
+            </div>
+            <div id="map"></div>
+        </div>
+
+        <!-- Panneau Droit -->
+        <div class="right-panel">
+            <!-- Stats en temps réel -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Véhicules Actifs</div>
+                    <div class="stat-value">
+                        <span id="vehicleCount">0</span>
+                    </div>
+                    <div class="stat-trend trend-up" id="vehicleTrend">
+                        ↑ +12%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Vitesse Moyenne</div>
+                    <div class="stat-value">
+                        <span id="avgSpeed">0</span>
+                        <span class="stat-unit">km/h</span>
+                    </div>
+                    <div class="stat-trend trend-down" id="speedTrend">
+                        ↓ -8%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Émissions CO₂</div>
+                    <div class="stat-value">
+                        <span id="emissions">0</span>
+                        <span class="stat-unit">kg</span>
+                    </div>
+                    <div class="stat-trend trend-down" id="emissionsTrend">
+                        ↓ -23%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temps Gain Moyen</div>
+                    <div class="stat-value">
+                        <span id="timeSaved">0</span>
+                        <span class="stat-unit">min</span>
+                    </div>
+                    <div class="stat-trend trend-up" id="timeTrend">
+                        ↑ +15%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique Trafic -->
+            <div class="chart-container">
+                <div class="chart-title">📊 Densité de Trafic (30 dernières minutes)</div>
+                <svg id="trafficChart"></svg>
+            </div>
+
+            <!-- Graphique Émissions -->
+            <div class="chart-container">
+                <div class="chart-title">🌱 Réduction d'Émissions</div>
+                <svg id="emissionsChart"></svg>
+            </div>
+
+            <!-- Alertes -->
+            <div class="alerts-container">
+                <div class="chart-title">⚠️ Alertes & Prédictions</div>
+                <div id="alertsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Dashboard Client Script -->
+    <script src="dist/dashboard.js"></script>
+</body>
+</html>
