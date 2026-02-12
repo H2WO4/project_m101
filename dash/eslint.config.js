@@ -1,6 +1,6 @@
-const js = require("@eslint/js");
-const tsPlugin = require("@typescript-eslint/eslint-plugin");
-const tsParser = require("@typescript-eslint/parser");
+import js from "@eslint/js";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 
 const baseRules = {
   ...js.configs.recommended.rules,
@@ -24,12 +24,12 @@ const baseRules = {
   "comma-dangle": ["error", "never"]
 };
 
-module.exports = [
+export default [
   {
     ignores: ["node_modules", "dist", "*.js"]
   },
   {
-    files: ["dash/dashboard.ts"],
+    files: ["dashboard.ts"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -52,7 +52,7 @@ module.exports = [
     rules: baseRules
   },
   {
-    files: ["dash/backend-server.ts"],
+    files: ["backend-server.ts"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

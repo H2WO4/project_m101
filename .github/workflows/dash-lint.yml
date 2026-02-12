@@ -27,5 +27,4 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        working-directory: ./dash
-        run: npx eslint . --config eslint.config.cjs
+        run: npx eslint ./dash --ext .ts,.tsx,.js
