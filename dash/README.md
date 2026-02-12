@@ -6,7 +6,6 @@ Système IoT de gestion intelligente du trafic urbain avec prédiction d'emboute
 
 **CityFlow Analytics** est une plateforme complète de gestion du trafic urbain en temps réel qui combine:
 - 📡 Collecte de données via capteurs IoT (MQTT)
-- 🤖 Prédiction d'embouteillages par IA (30 min à l'avance)
 - 🗺️ Reroutage intelligent automatique
 - 📊 Dashboard temps réel avec WebSockets
 - 🌱 Réduction des émissions de CO₂
