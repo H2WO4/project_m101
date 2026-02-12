@@ -300,6 +300,5 @@ services:
       - 1884:1884
     profiles:
       - iot
-
 networks:
   default:
