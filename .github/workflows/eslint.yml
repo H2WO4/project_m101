@@ -6,16 +6,12 @@ on:
   pull_request:
     branches: ["main"]
   schedule:
-    - cron: '37 18 * * 4' 
+    - cron: '37 18 * * 4'
 
 jobs:
   lint:
     name: Run ESLint
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: dash   
 
     steps:
       - name: Checkout repository
@@ -25,11 +21,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: dash/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
+      - name: Go to dash folder
+        run: cd dash && npm ci && npm run lint
