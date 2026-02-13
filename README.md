@@ -3,6 +3,7 @@
 Système IoT de gestion intelligente du trafic urbain avec prédiction d'embouteillages et reroutage automatique pour réduire les émissions de CO₂ de 23%.
 
 ## Diagrame de la ville
+```mermaid
 ---
 config:
   graph:
@@ -94,7 +95,7 @@ graph LR
   19 <--> 27
   22 <--> 30
   23 <--> 31
-
+```
 
 ## 🚀 Démarrage Rapide
 
