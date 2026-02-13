@@ -1,13 +1,10 @@
-use std::{sync::LazyLock, time::Duration};
+use std::time::Duration;
 
 use chrono::{Local, NaiveDateTime};
-use regex::Regex;
 use rumqttc::{AsyncClient, Event, MqttOptions, Packet, QoS, SubscribeFilter};
 use sqlx::query_file;
 
 use crate::{db::POOL, load_var};
-
-static TOPIC_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^traffic/(\d+)$").expect("RegEx should be valid"));
 
 /// Handle the entire communication process with the MQTT broker
 /// Data is gathered from all the sensors' topics, and sent to the DB
@@ -46,13 +43,8 @@ pub async fn aggregate() {
 
         log::trace!("MQTT: {} = {:?}", data.topic, data.payload);
 
-        let id: i32 = TOPIC_REGEX
-            .captures(&data.topic)
-            .expect("RegEx should match")[1]
-            .parse()
-            .expect("should be a number");
-
-        let avg_speed = data.payload[0] as i32;
+        let id = data.payload[0] as i32;
+        let avg_speed = data.payload[1] as i32;
 
         let timestamp: NaiveDateTime = Local::now().naive_local();
 

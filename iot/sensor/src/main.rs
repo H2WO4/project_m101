@@ -2,6 +2,7 @@ use std::env;
 use std::time::Duration;
 
 use env_logger::Env;
+use rand::random_range;
 use rumqttc::{AsyncClient, MqttOptions, QoS};
 use tokio::{task, time};
 
@@ -38,12 +39,11 @@ async fn main() {
 
 /// Report the sensor's information to the MQTT broker
 async fn send_loop(client: AsyncClient, unique_id: u8) {
-    let wait_time = 24;
     let topic = format!("traffic/{unique_id}");
 
     loop {
-        let avg_speed: u32 = ((unique_id as u32) * 17 % 43) + 10;
-        let data = vec![avg_speed as u8];
+        let avg_speed: u32 = ((unique_id as u32) * 17 % 43) + 10_u32.saturating_add_signed(random_range((-3)..=3));
+        let data = vec![unique_id, avg_speed as u8];
 
         // While a performance loss, data must be cloned to be able to be logged afterwards
         let result = client
@@ -55,6 +55,6 @@ async fn send_loop(client: AsyncClient, unique_id: u8) {
         log::trace!("Data sent: {data:?}");
 
         // Wait before sending new data
-        time::sleep(Duration::from_secs(wait_time as u64)).await;
+ time::sleep(Duration::from_secs(24_u64.saturating_add_signed(random_range((-4)..=4)))).await;
     }
 }

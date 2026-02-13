@@ -16,6 +16,10 @@ requests:
         name: get
         method: GET
         url: "{{ host }}/api/nodes"
-        # body:
-        #   type: json
-        #   data: { "data": "{{ response('example_get') | jsonpath('$.data') }}" }
+  jams:
+    name: jams
+    requests:
+      jams_get:
+        name: get
+        method: GET
+        url: "{{ host }}/api/jams"
