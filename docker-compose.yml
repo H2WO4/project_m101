@@ -1,0 +1,178 @@
+services:
+  # -------------------------
+  # IOT (dossier ./iot)
+  # -------------------------
+  iot_mqtt:
+    image: bytebeamio/rumqttd
+    profiles: ["full", "mqtt"]
+    ports:
+      - "1884:1883"
+      - "1885:1884"
+    networks: [infra]
+
+  iot_db:
+    image: dhi.io/postgres:18-alpine3.22-dev
+    profiles: ["full", "db"]
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5434:5432"
+    restart: unless-stopped
+    volumes:
+      - iot_postgres_data:/var/lib/postgresql/data
+    networks: [infra]
+
+  iot_aggregator:
+    build: ./iot/aggregator
+    profiles: ["full"]
+    depends_on:
+      - iot_mqtt
+      - iot_db
+    environment:
+      DATABASE_URL: postgres://postgres:password@iot_db
+      DOCKER: true
+      LOG_LEVEL: info
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      SENSOR_NUMBER: 32
+    ports:
+      - "8082:8080"
+    networks: [infra]
+
+  x-iot-sensor-template: &iot_sensor_template
+    build: ./iot/sensor
+    profiles: ["full"]
+    depends_on: [iot_mqtt]
+    environment:
+      LOG_LEVEL: info
+    networks: [infra]
+
+  iot_sensor_0:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 0,  LOG_LEVEL: info } }
+  iot_sensor_1:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 1,  LOG_LEVEL: info } }
+  iot_sensor_2:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 2,  LOG_LEVEL: info } }
+  iot_sensor_3:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 3,  LOG_LEVEL: info } }
+  iot_sensor_4:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 4,  LOG_LEVEL: info } }
+  iot_sensor_5:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 5,  LOG_LEVEL: info } }
+  iot_sensor_6:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 6,  LOG_LEVEL: info } }
+  iot_sensor_7:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 7,  LOG_LEVEL: info } }
+  iot_sensor_8:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 8,  LOG_LEVEL: info } }
+  iot_sensor_9:  { <<: *iot_sensor_template, environment: { UNIQUE_ID: 9,  LOG_LEVEL: info } }
+  iot_sensor_10: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 10, LOG_LEVEL: info } }
+  iot_sensor_11: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 11, LOG_LEVEL: info } }
+  iot_sensor_12: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 12, LOG_LEVEL: info } }
+  iot_sensor_13: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 13, LOG_LEVEL: info } }
+  iot_sensor_14: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 14, LOG_LEVEL: info } }
+  iot_sensor_15: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 15, LOG_LEVEL: info } }
+  iot_sensor_16: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 16, LOG_LEVEL: info } }
+  iot_sensor_17: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 17, LOG_LEVEL: info } }
+  iot_sensor_18: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 18, LOG_LEVEL: info } }
+  iot_sensor_19: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 19, LOG_LEVEL: info } }
+  iot_sensor_20: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 20, LOG_LEVEL: info } }
+  iot_sensor_21: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 21, LOG_LEVEL: info } }
+  iot_sensor_22: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 22, LOG_LEVEL: info } }
+  iot_sensor_23: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 23, LOG_LEVEL: info } }
+  iot_sensor_24: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 24, LOG_LEVEL: info } }
+  iot_sensor_25: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 25, LOG_LEVEL: info } }
+  iot_sensor_26: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 26, LOG_LEVEL: info } }
+  iot_sensor_27: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 27, LOG_LEVEL: info } }
+  iot_sensor_28: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 28, LOG_LEVEL: info } }
+  iot_sensor_29: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 29, LOG_LEVEL: info } }
+  iot_sensor_30: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 30, LOG_LEVEL: info } }
+  iot_sensor_31: { <<: *iot_sensor_template, environment: { UNIQUE_ID: 31, LOG_LEVEL: info } }
+
+  # -------------------------
+  # DB (dossier ./db)
+  # -------------------------
+  db_postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=cityflow
+      - POSTGRES_PASSWORD=cityflowpass
+      - POSTGRES_DB=cityflow
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - db_postgres_data:/var/lib/postgresql/data
+    networks: [infra]
+
+  db_adminer:
+    image: adminer:latest
+    depends_on:
+      - db_postgres
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+    networks: [infra]
+
+  # -------------------------
+  # MONI (dossier ./moni)
+  # -------------------------
+  moni_prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    ports:
+      - "9091:9090"
+    restart: unless-stopped
+    volumes:
+      - ./moni/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - moni_prom_data:/prometheus
+    networks: [infra]
+
+  moni_grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - moni_prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3002:3000"
+    restart: unless-stopped
+    volumes:
+      - moni_grafana_data:/var/lib/grafana
+    networks: [infra]
+
+  moni_node_exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9101:9100"
+    restart: unless-stopped
+    networks: [infra]
+
+  moni_cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8083:8080"
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks: [infra]
+
+  moni_postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    depends_on:
+      - db_postgres
+    environment:
+      - DATA_SOURCE_NAME=postgresql://cityflow:cityflowpass@db_postgres:5432/cityflow?sslmode=disable
+    ports:
+      - "9187:9187"
+    restart: unless-stopped
+    networks: [infra]
+
+networks:
+  infra: {}
+
+volumes:
+  iot_postgres_data: {}
+  dash_prometheus_data: {}
+  dash_grafana_data: {}
+  db_postgres_data: {}
+  moni_prom_data: {}
+  moni_grafana_data: {}
