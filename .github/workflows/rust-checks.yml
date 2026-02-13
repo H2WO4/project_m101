@@ -1,0 +1,51 @@
+name: Rust checks
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+env:
+  SQLX_OFFLINE: true
+
+jobs:
+  check-sensor:
+    name: Check `sensor`
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        working-directory: iot/sensor
+        run: cargo build --verbose
+
+      - name: Lint
+        working-directory: iot/sensor
+        run: cargo clippy --verbose
+
+      - name: Test
+        working-directory: iot/sensor
+        run: cargo test --verbose
+
+  check-aggregator:
+    name: Check `aggregator`
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        working-directory: iot/aggregator
+        run: cargo build --verbose
+
+      - name: Lint
+        working-directory: iot/aggregator
+        run: cargo clippy --verbose
+
+      - name: Test
+        working-directory: iot/aggregator
+        run: cargo test --verbose
