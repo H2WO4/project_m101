@@ -109,9 +109,10 @@ const app = express();
 // En prod: __dirname pointe vers dist/
 const isProduction = __dirname.includes("dist");
 const staticPath = isProduction ? path.join(__dirname, "..") : __dirname;
+const distPath = isProduction ? path.join(__dirname, "..") : path.join(__dirname, "..", "dist");
 
 app.use(express.static(staticPath));
-app.use("/dist", express.static(path.join(staticPath, "dist")));
+app.use("/dist", express.static(distPath));
 
 // Servir le dashboard principal
 app.get("/", (_req: Request, res: Response) => {

@@ -102,35 +102,6 @@ graph LR
 
 # 🚦 CityFlow Analytics - Dashboard Temps Réel (TypeScript)
 
-Système IoT de gestion intelligente du trafic urbain avec prédiction d'embouteillages et reroutage automatique pour réduire les émissions de CO₂ de 23%.
-
-## 📋 Vue d'ensemble
-
-**CityFlow Analytics** est une plateforme complète de gestion du trafic urbain en temps réel qui combine:
-- 📡 Collecte de données via capteurs IoT (MQTT)
-- 🗺️ Reroutage intelligent automatique
-- 📊 Dashboard temps réel avec WebSockets
-- 🌱 Réduction des émissions de CO₂
-- 🔷 **Backend TypeScript avec typage strict**
-
-## ✨ Fonctionnalités
-
-### Dashboard Temps Réel
-- **Carte Interactive OpenStreetMap**: Visualisation du trafic en temps réel
-- **WebSockets**: Mise à jour instantanée des données
-- **Visualisations D3.js**: Graphiques dynamiques de densité et émissions
-- **Alertes Prédictives**: Notifications d'embouteillages 30 min à l'avance
-- **Métriques Live**: Véhicules actifs, vitesse moyenne, émissions, temps gagné
-
-### Architecture Technique
-- **Backend**: Node.js + TypeScript + WebSocket + Express
-- **Frontend**: HTML5 + Leaflet.js + D3.js
-- **Base de données**: TimescaleDB (séries temporelles)
-- **Messaging**: MQTT (Mosquitto)
-- **Orchestration**: Kubernetes (K3s)
-- **Monitoring**: Prometheus + Grafana
-- **CI/CD**: ArgoCD (GitOps)
-
 ## 🚀 Démarrage Rapide
 
 ### Prérequis
@@ -180,6 +151,11 @@ npm start
 open http://localhost:8080
 ```
 
+## Docker 
+```bash
+open http://localhost:8080
+```
+
 ## 📁 Structure du Projet
 
 ```
@@ -213,32 +189,6 @@ cityflow-analytics/
     ├── simulator.js
     └── Dockerfile
 ```
-
-## 🎯 Utilisation
-
-### Dashboard Web
-
-Le dashboard affiche en temps réel:
-
-1. **Carte Interactive**
-   - Points verts: Trafic fluide (< 30 km/h)
-   - Points jaunes: Trafic dense (30-50 km/h)
-   - Points rouges: Embouteillage (> 50 km/h)
-
-2. **Statistiques en Direct**
-   - Nombre de véhicules actifs
-   - Vitesse moyenne
-   - Émissions CO₂ actuelles
-   - Temps moyen gagné
-
-3. **Graphiques D3.js**
-   - Densité de trafic (30 dernières minutes)
-   - Réduction d'émissions (avant/après)
-
-4. **Alertes & Prédictions**
-   - Embouteillages prévus
-   - Routes alternatives suggérées
-   - Métriques d'optimisation
 
 ### API REST
 
@@ -291,43 +241,6 @@ Messages reçus:
 - ✅ **Détection d'erreurs** à la compilation
 - ✅ **Meilleure maintenabilité** du code
 
-### Types Principaux
-
-```typescript
-interface VehicleData {
-    id: number;
-    lat: number;
-    lng: number;
-    speed: number;
-    status: VehicleStatus;
-    direction: number;
-    directionName: string;
-}
-
-interface TrafficSegment {
-    id: number;
-    name: string;
-    coordinates: [number, number][];
-    density: number;
-    avgSpeed: number;
-    vehicleCount: number;
-    status: VehicleStatus;
-    color: string;
-}
-
-interface Stats {
-    totalVehicles: number;
-    avgSpeed: number;
-    emissions: number;
-    emissionsReduction: number;
-    timeSaved: number;
-    timestamp: string;
-}
-
-type VehicleStatus = 'fluide' | 'dense' | 'embouteillage';
-type AlertType = 'congestion' | 'accident' | 'roadwork' | 'reroute' | 'optimization';
-```
-
 ### Scripts npm
 
 ```bash
@@ -348,31 +261,6 @@ npm start
 
 # Tests
 npm test
-```
-
-## 🐳 Docker
-
-### Build de l'image
-```bash
-docker build -t cityflow/dashboard:latest .
-```
-
-### Lancement du stack complet
-```bash
-docker-compose up -d
-```
-
-Services lancés:
-- **Dashboard**: http://localhost:8080
-- **Grafana**: http://localhost:3000 (admin/admin)
-- **Prometheus**: http://localhost:9090
-- **MQTT**: mqtt://localhost:1883
-
-### Logs
-```bash
-docker-compose logs -f dashboard
-docker-compose logs -f mosquitto
-docker-compose logs -f timescaledb
 ```
 
 ## ☸️ Déploiement Kubernetes
@@ -575,23 +463,6 @@ backend-server.ts
 - **Alertes en temps réel** (accidents, travaux, optimisations)
 - **Capteurs IoT** simulés (lecture toutes les 5 secondes)
 
-## 🧪 Tests
-
-### Tests Unitaires
-```bash
-npm test
-```
-
-### Tests d'Intégration
-```bash
-npm run test:integration
-```
-
-### Test de Charge (WebSocket)
-```bash
-npm run test:load
-```
-
 ## 📈 Performance
 
 ### Objectifs
@@ -650,50 +521,5 @@ const ws = new WebSocket('wss://cityflow.example.com/ws');
 - **Mosquitto** - MQTT Broker
 - **Prometheus + Grafana** - Monitoring
 - **Kubernetes + ArgoCD** - Orchestration & GitOps
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues !
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
-### Guidelines de Contribution
-
-- Utiliser TypeScript avec typage strict
-- Suivre les conventions de code existantes
-- Ajouter des tests pour les nouvelles fonctionnalités
-- Documenter les interfaces et types publics
-
-## 📝 Licence
-
-Ce projet est sous licence MIT. Voir `LICENSE` pour plus de détails.
-
-## 👥 Équipe
-
-- **Développement**: CityFlow Team
-- **Architecture**: IoT & Microservices
-- **DevOps**: K8s + GitOps
-- **Migration TypeScript**: 2024
-
-## 📧 Contact
-
-- Website: https://cityflow.example.com
-- Email: contact@cityflow.example.com
-- GitHub: https://github.com/cityflow/analytics
-
-## 🙏 Remerciements
-
-- [TypeScript](https://www.typescriptlang.org/) - Langage typé pour JavaScript
-- [Leaflet.js](https://leafletjs.com/) - Cartes interactives
-- [D3.js](https://d3js.org/) - Visualisations de données
-- [TimescaleDB](https://www.timescale.com/) - Base de données séries temporelles
-- [Mosquitto](https://mosquitto.org/) - MQTT Broker
-- [OpenStreetMap](https://www.openstreetmap.org/) - Données cartographiques
-
----
 
 **Made with ❤️ by CityFlow Team** - *Smart Cities for a Better Tomorrow* 🌍
