@@ -10,6 +10,7 @@ export default defineConfig(
   {
     languageOptions: {
       parserOptions: {
+        allowDefaultProject: ['*.mjs', 'dist/*.js'],
         projectService: true,
       },
     },
