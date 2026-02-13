@@ -130,6 +130,12 @@ cd dash
 # permet d'installer les dependances
 npm install
 ```
+
+```bash
+# permet de lancer le projet 
+npm run dev
+```
+
 une fois ça terminer retourner a la racine 
 
 ```bash
@@ -198,18 +204,66 @@ Messages reçus:
 - `type: 'predictions'` - Nouvelles prédictions
 - `type: 'alerts'` - Alertes système
 
-## 📊 Monitoring
+## 📊 Monitoring & Visualisation
 
-### Prometheus
+### Prometheus (Port 9091)
 
+Collecte les métriques depuis :
+- **Node Exporter** (9100) - Métriques système
+- **cAdvisor** (8081) - Métriques Docker
+- **Postgres Exporter** (9187) - Métriques base de données
 
-### Grafana
+Configuration : `./moni/prometheus/prometheus.yml`
 
-Dashboards préconfigurés:
-- **Perfomance VM**: Vue d'ensemble du trafic
-- **Performance DB**: Métriques de performance système
+Accès : http://localhost:9091
 
-Accès: http://IPDELAVM:3000 (admin/admin)
+### Grafana (Port 3002)
+
+**Identifiants par défaut :** `admin / admin`
+
+#### Importer les Dashboards
+
+1. **Accéder à Grafana** → http://localhost:3002
+
+2. **Première méthode - Import automatique (recommandé)**
+   
+   Les dashboards sont auto-provisionnés via Docker si les fichiers sont dans `./moni/dash/` :
+   ```bash
+   # Vérifier que les fichiers existent
+   ls ./moni/dash/
+   # Devrait afficher :
+   # - Postgresql_dashboard.json
+   # - vm_export_dashboard.json
+   ```
+
+3. **Deuxième méthode - Import manuel**
+
+   **Importer le dashboard Postgresql :**
+   - Aller à : Menu → Dashboards → New → Import
+   - Copier le contenu de `./moni/dash/Postgresql_dashboard.json`
+   - Ou cliquer sur "Upload JSON file"
+   - Sélectionner la data source : Prometheus
+   - Cliquer "Import"
+
+   **Importer le dashboard VM :**
+   - Même processus avec `./moni/dash/vm_export_dashboard.json`
+
+#### Dashboards Disponibles
+
+| Dashboard | Description | Métriques |
+|-----------|-------------|-----------|
+| **vm_export_dashboard.json** | Vue d'ensemble système | CPU, RAM, Disque, Réseau |
+| **Postgresql_dashboard.json** | Métriques base de données | Connexions, Transactions, Cache |
+
+#### Configurer une Data Source
+
+Si nécessaire, ajouter manuellement Prometheus :
+
+1. Menu → Admin → Data sources
+2. Click "Add data source"
+3. Sélectionner "Prometheus"
+4. URL : `http://prometheus:9090`
+5. Click "Save & Test"
 
 
 
