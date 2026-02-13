@@ -42,7 +42,7 @@ async fn send_loop(client: AsyncClient, unique_id: u8) {
     let topic = format!("traffic/{unique_id}");
 
     loop {
-        let avg_speed: u32 = ((unique_id as u32) * 17 % 43) + 10_u32.saturing_add_signed(random_range((-3)..=3));
+        let avg_speed: u32 = ((unique_id as u32) * 17 % 43) + 10_u32.saturating_add_signed(random_range((-3)..=3));
         let data = vec![unique_id, avg_speed as u8];
 
         // While a performance loss, data must be cloned to be able to be logged afterwards
@@ -55,6 +55,6 @@ async fn send_loop(client: AsyncClient, unique_id: u8) {
         log::trace!("Data sent: {data:?}");
 
         // Wait before sending new data
- time::sleep(Duration::from_secs(24_u64.saturing_add_signed(random_range((-4)..=4)))).await;
+ time::sleep(Duration::from_secs(24_u64.saturating_add_signed(random_range((-4)..=4)))).await;
     }
 }
