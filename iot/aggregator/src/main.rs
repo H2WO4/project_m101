@@ -1,5 +1,6 @@
 mod db;
 mod graph;
+mod jams;
 mod macros;
 mod models;
 mod mqtt;
@@ -56,7 +57,9 @@ async fn main() -> io::Result<()> {
 
 /// Register top-level services
 fn configure(cfg: &mut ServiceConfig) {
-    let service = scope("api").configure(nodes::configure);
+    let service = scope("api")
+        .configure(jams::configure)
+        .configure(nodes::configure);
 
     cfg.service(service);
 }
